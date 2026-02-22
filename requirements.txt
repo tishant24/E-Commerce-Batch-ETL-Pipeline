@@ -1,0 +1,12 @@
+# E-Commerce ETL Pipeline - Python Dependencies
+# Install all at once: pip install -r requirements.txt
+
+pyspark==3.5.0
+pandas==2.1.4
+numpy==1.26.2
+pyarrow==14.0.1
+mysql-connector-python==8.2.0
+streamlit==1.29.0
+plotly==5.18.0
+python-dotenv==1.0.0
+openpyxl==3.1.2

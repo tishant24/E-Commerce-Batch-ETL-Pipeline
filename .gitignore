@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.env
+venv/
+env/
+.venv/
+
+# Large data files - do not commit to git
+data/raw/*.csv
+data/raw/*.xlsx
+data/raw/*.json
+data/processed/
+logs/*.log
+logs/*.json
+logs/quality_report/
+
+# Java / Spark jars - download separately
+jars/*.jar
+
+# Streamlit
+.streamlit/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Credentials - never commit
+*.env
+credentials.json
+config/secrets.py
