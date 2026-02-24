@@ -160,7 +160,6 @@ PAGES = [
     "Parquet Storage",
     "MySQL Loading",
     "Spark Optimizations",
-    "Pipeline Logs",
     "Analytics and Insights",
 ]
 
@@ -1076,101 +1075,6 @@ spark = SparkSession.builder \\
 # 3. Caching with disk spill (MEMORY_AND_DISK_SER storage level)
 
 # Kryo helps most with large shuffles or many broadcasts.
-""")
-
-
-# ---------------------------------------------------------------
-# PAGE: PIPELINE LOGS
-# ---------------------------------------------------------------
-
-elif page == "Pipeline Logs":
-    st.title("Pipeline Logs")
-    st.markdown("---")
-
-    log_output = """2024-01-15 14:22:01 | INFO     | Pipeline      | ======================================================================
-2024-01-15 14:22:01 | INFO     | Pipeline      | PIPELINE STARTED
-2024-01-15 14:22:01 | INFO     | Pipeline      | Job Start Time : 2024-01-15 14:22:01
-2024-01-15 14:22:01 | INFO     | Pipeline      | ======================================================================
-2024-01-15 14:22:03 | INFO     | Pipeline      | --- STAGE 1: EXTRACT ---
-2024-01-15 14:22:03 | INFO     | Extract       | Reading raw data from: data/raw/online_retail_II.csv
-2024-01-15 14:22:03 | INFO     | Extract       | Parse mode: PERMISSIVE
-2024-01-15 14:22:08 | INFO     | Extract       | Raw records loaded: 1,067,371
-2024-01-15 14:22:09 | INFO     | Extract       | Sampled down to 500,000 records
-2024-01-15 14:22:09 | INFO     | Pipeline      | STAGE [Extract] | Records: 500,000
-2024-01-15 14:22:09 | INFO     | Pipeline      | --- STAGE 2: TRANSFORM ---
-2024-01-15 14:22:09 | INFO     | Transform     | Starting transformation pipeline...
-2024-01-15 14:22:09 | INFO     | Transform     | Renaming columns to snake_case...
-2024-01-15 14:22:10 | INFO     | Transform     | Casting column types...
-2024-01-15 14:22:11 | INFO     | Transform     | Handling null values...
-2024-01-15 14:22:14 | INFO     | Transform     | Null handling: dropped 37,482 rows with critical nulls
-2024-01-15 14:22:14 | INFO     | Transform     | Deduplicating records...
-2024-01-15 14:22:17 | INFO     | Transform     | Deduplication: removed 14,902 duplicate rows
-2024-01-15 14:22:17 | INFO     | Transform     | Filtering invalid records...
-2024-01-15 14:22:21 | INFO     | Transform     | Invalid record filter: removed 11,203 rows
-2024-01-15 14:22:21 | INFO     | Transform     | Adding derived columns...
-2024-01-15 14:22:22 | INFO     | Transform     | All transformations complete.
-2024-01-15 14:22:22 | INFO     | Pipeline      | STAGE [Transform] | Records: 436,413
-2024-01-15 14:22:22 | INFO     | Pipeline      | --- STAGE 3: BROADCAST JOIN ---
-2024-01-15 14:22:23 | INFO     | Pipeline      | Broadcast join complete. 'region' column added.
-2024-01-15 14:22:23 | INFO     | Pipeline      | --- STAGE 4: DATA QUALITY ---
-2024-01-15 14:22:23 | INFO     | Pipeline      | Caching DataFrame for quality checks...
-2024-01-15 14:22:29 | INFO     | QualityChecks | Row Count Check | Raw: 500,000 | Processed: 436,413 | PASS
-2024-01-15 14:22:33 | INFO     | QualityChecks | Null Check [invoice_id]: 0.0% | PASS
-2024-01-15 14:22:37 | INFO     | QualityChecks | Null Check [customer_id]: 0.0% | PASS
-2024-01-15 14:22:47 | INFO     | QualityChecks | Duplicate Check | Duplicates: 0 | Pct: 0.0% | PASS
-2024-01-15 14:22:48 | INFO     | QualityChecks | Schema Check | PASS | Schema matches exactly
-2024-01-15 14:22:50 | INFO     | QualityChecks | Quality Report: 18 checks | FAIL: 0 | WARN: 0 | PASSED
-2024-01-15 14:22:50 | INFO     | Pipeline      | --- STAGE 5: WRITE PARQUET ---
-2024-01-15 14:22:50 | INFO     | Load          | Writing Parquet to: data/processed/parquet/retail_data
-2024-01-15 14:22:50 | INFO     | Load          | Partition column  : invoice_year
-2024-01-15 14:22:50 | INFO     | Load          | Repartition count : 8
-2024-01-15 14:23:04 | INFO     | Load          | Parquet write complete.
-2024-01-15 14:23:04 | INFO     | Pipeline      | --- STAGE 6: WRITE MYSQL ---
-2024-01-15 14:23:04 | INFO     | Load          | Writing to MySQL table: retail_transactions
-2024-01-15 14:23:04 | INFO     | Load          | Batch size: 5,000
-2024-01-15 14:23:47 | INFO     | Load          | MySQL write complete.
-2024-01-15 14:23:47 | INFO     | Pipeline      | ======================================================================
-2024-01-15 14:23:47 | INFO     | Pipeline      | PIPELINE FINISHED
-2024-01-15 14:23:47 | INFO     | Pipeline      | Job End Time            : 2024-01-15 14:23:47
-2024-01-15 14:23:47 | INFO     | Pipeline      | Total Duration          : 106.42 seconds
-2024-01-15 14:23:47 | INFO     | Pipeline      | Validation Status       : PASSED
-2024-01-15 14:23:47 | INFO     | Pipeline      | raw_record_count        : 500,000
-2024-01-15 14:23:47 | INFO     | Pipeline      | processed_record_count  : 436,413
-2024-01-15 14:23:47 | INFO     | Pipeline      | quality_check_status    : PASSED
-2024-01-15 14:23:47 | INFO     | Pipeline      | mysql_records_loaded    : 436,413
-2024-01-15 14:23:47 | INFO     | Pipeline      | ======================================================================"""
-
-    st.text_area("logs/pipeline.log", value=log_output, height=450)
-
-    st.markdown("---")
-    st.subheader("Logger Setup")
-    code_block("""import logging
-
-def get_logger(name="ETLPipeline"):
-    logger = logging.getLogger(name)
-    logger.setLevel(logging.DEBUG)
-
-    formatter = logging.Formatter(
-        fmt="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S"
-    )
-
-    # Console: show INFO and above
-    console_handler = logging.StreamHandler()
-    console_handler.setLevel(logging.INFO)
-    console_handler.setFormatter(formatter)
-
-    # File: show DEBUG and above (full detail)
-    file_handler = logging.FileHandler("logs/pipeline.log")
-    file_handler.setLevel(logging.DEBUG)
-    file_handler.setFormatter(formatter)
-
-    logger.addHandler(console_handler)
-    logger.addHandler(file_handler)
-    return logger
-
-logger = get_logger("Extract")
-logger.info("Reading raw data from: data/raw/online_retail_II.csv")
 """)
 
 
